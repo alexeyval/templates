@@ -18,7 +18,7 @@ func main() {
 	// инициализируем канал, куда будут прилетать обновления от API
 	var ucfg = tgbotapi.NewUpdate(0)
 	ucfg.Timeout = 60
-	upd := bot.GetUpdatesChan(ucfg)
+	upd, _ := bot.GetUpdatesChan(ucfg)
 
 	// читаем обновления из канала
 	for {
