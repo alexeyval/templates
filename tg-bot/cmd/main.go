@@ -49,7 +49,7 @@ func main() {
 					switch len(UserName) {
 					case 0:
 						msgText += UserNameFirstName
-				default:
+					default:
 						msgText += UserName
 					}
 
@@ -57,8 +57,8 @@ func main() {
 						ChatID,
 						msgText)
 					_, _ = bot.Send(msg)
-					}
-	}
-}
+				}
+			}
+		}
 	}
 }
