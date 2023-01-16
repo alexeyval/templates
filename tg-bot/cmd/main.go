@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"log"
 	"reflect"
@@ -40,77 +39,26 @@ func main() {
 
 			// Текст сообщения
 			Text := update.Message.Text
-			CallbackQueryHandler(update.CallbackQuery)
 
 			log.Printf("[%s, %s] %d %s", UserName, UserNameFirstName, ChatID, Text)
 
 			if reflect.TypeOf(update.Message.Text).Kind() == reflect.String && update.Message.Text != "" {
 				switch {
-				case update.CallbackQuery != nil:
-					CallbackQueryHandler(update.CallbackQuery)
-					fmt.Println("Я тут")
-					continue
 				case Text == "/start":
-
-				//bot.me(chat_id = message.chat.id, message_id = to_pin)
+					msgText := "Привет, "
+					switch len(UserName) {
+					case 0:
+						msgText += UserNameFirstName
 				default:
-					fmt.Println(Text)
-					msgText := "Поддержите меня 😎"
-					//switch len(UserName) {
-					//case 0:
-					//	msgText += UserNameFirstName
-					//default:
-					//	msgText += UserName
-					//}
+						msgText += UserName
+					}
 
 					msg := tgbotapi.NewMessage(
 						ChatID,
 						msgText)
-
-					v := "/поддержать"
-					button := []tgbotapi.InlineKeyboardButton{{
-						Text: "Поддержать 👍",
-						URL:  &v,
-					},
+					_, _ = bot.Send(msg)
 					}
-					var buttons [][]tgbotapi.InlineKeyboardButton
-					buttons = append(buttons, button)
-					//markup := tgbotapi.InlineKeyboardMarkup{InlineKeyboard: buttons}
-					//msg.ReplyMarkup = tgbotapi.NewInlineKeyboardButtonURL("Поддержать 👍", "/поддержать")
-					//_ = []tgbotapi.InlineKeyboardButton{}
-					//msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(button)
-
-					var rows []tgbotapi.InlineKeyboardButton
-					rows = append(rows, tgbotapi.NewInlineKeyboardButtonData("Next", "/поддержать"))
-					//rows = append(rows, tgbotapi.NewInlineKeyboardButtonURL("Поддержать", "/поддержать"))
-					msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(rows)
-
-					message, err := bot.Send(msg)
-					fmt.Println(err)
-
-					c := tgbotapi.PinChatMessageConfig{
-						ChatID:              ChatID,
-						MessageID:           message.MessageID,
-						DisableNotification: false,
-					}
-					_, _ = bot.PinChatMessage(c)
-				}
-			}
-		}
 	}
 }
-
-func CallbackQueryHandler(query *tgbotapi.CallbackQuery) {
-	split := query.Data
-	if split == "pager" {
-		HandleNavigationCallbackQuery(query.Message.MessageID, split)
-		return
 	}
-}
-
-func HandleNavigationCallbackQuery(messageId int, data string) {
-	pagerType := data
-	_ = messageId
-
-	fmt.Println(pagerType)
 }
