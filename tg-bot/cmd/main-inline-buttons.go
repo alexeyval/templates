@@ -6,9 +6,11 @@ import (
 	"log"
 )
 
-const pinMsg = "Поблагодарить автора бота 😎"
-const pinButton = "СДЕЛАТЬ ПО КАЙФУ"
-const pinAnswer = "Поддержать проект: `4276 3802 1719 2553`"
+const pinMsg = "Hello"
+const pinButton = "➡️"
+const pinAnswer = "Thank you ❤️"
+
+var sendAnswer []string
 
 var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 	tgbotapi.NewInlineKeyboardRow(
@@ -17,8 +19,10 @@ var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 )
 
 func main() {
+	sendAnswer = append(sendAnswer, "Message 1")
+	sendAnswer = append(sendAnswer, "Message 2")
 	// подключаемся к боту с помощью токена
-	bot, err := tgbotapi.NewBotAPI("5941964544:AAGonU-msKpkY9N-W4E0CblToGSA9bW8SWI")
+	bot, err := tgbotapi.NewBotAPI("TOKEN")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -38,12 +42,26 @@ func main() {
 		if update.Message != nil {
 			// If the message was open, add a copy of our numeric keyboard.
 			switch update.Message.Text {
+			case "/start":
+				fallthrough
 			case "open":
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, pinMsg)
 				msg.ReplyMarkup = numericKeyboard
 
 				// Send the message.
-				if _, err = bot.Send(msg); err != nil {
+				message, err := bot.Send(msg)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				c := tgbotapi.PinChatMessageConfig{
+					ChatID:              update.Message.Chat.ID,
+					MessageID:           message.MessageID,
+					DisableNotification: false,
+				}
+				_, err = bot.PinChatMessage(c)
+				if err != nil {
 					fmt.Println(err)
 					return
 				}
@@ -56,13 +74,16 @@ func main() {
 				fmt.Println(err)
 				return
 			}
+			return
 
 			// And finally, send a message containing the data received.
-			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
-			msg.ParseMode = tgbotapi.ModeMarkdown
-			if _, err = bot.Send(msg); err != nil {
-				fmt.Println(err)
-				return
+			for _, answer := range sendAnswer {
+				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, answer)
+				msg.ParseMode = tgbotapi.ModeMarkdown
+				if _, err = bot.Send(msg); err != nil {
+					fmt.Println(err)
+					return
+				}
 			}
 		}
 	}
